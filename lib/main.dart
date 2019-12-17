@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app3_shop/screens/products_overview_screen.dart';
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -9,7 +8,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyShop',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+          primarySwatch: Colors.purple,
+          accentColor: Colors.deepOrangeAccent,
+          fontFamily: 'Lato'),
       home: ProductsOverviewScreen(),
     );
   }
