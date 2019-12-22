@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app3_shop/providers/cart.dart';
+import 'package:flutter_app3_shop/screens/cart_screen.dart';
 import 'package:provider/provider.dart';
 import './providers/products.dart';
 import 'package:flutter_app3_shop/screens/product_detail.screen.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
           title: 'MyShop',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
               primarySwatch: Colors.purple,
               accentColor: Colors.deepOrangeAccent,
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
           home: ProductsOverviewScreen(),
           routes: {
             ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+            CartScreen.routeName: (ctx) => CartScreen()
           }),
     );
   }
