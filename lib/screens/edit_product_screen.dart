@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app3_shop/providers/product.dart';
+import 'package:flutter_app3_shop/providers/products.dart';
+import 'package:provider/provider.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -29,12 +31,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _priceFocusNode.dispose();
     _decriptionFocusNode.dispose();
     _decriptionFocusNode.dispose();
-    _imageUrlFocusNode.dispose();
     _imageUrlFocusNode.removeListener(_updateImageUrl);
+    _imageUrlFocusNode.dispose();
   }
 
   void _updateImageUrl() {
+    var value = _imageUrlController.text;
     if (!_imageUrlFocusNode.hasFocus) {
+      if ((!value.startsWith('http') && !value.startsWith('https')) ||
+          (!value.endsWith('.png') &&
+              !value.endsWith('.jpg') &&
+              !value.endsWith('.jpeg'))) {
+        return;
+      }
+
       setState(() {});
     }
   }
@@ -45,7 +55,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState.save();
-    print(_editedProduct.title);
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -95,6 +106,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(_decriptionFocusNode);
                     },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a price';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return ' Please enter a valid Number';
+                      }
+                      if (double.parse(value) <= 0) {
+                        return 'Please enter a number greater than 0';
+                      }
+                      return null;
+                    },
                     onSaved: (value) {
                       _editedProduct = Product(
                           title: _editedProduct.title,
@@ -108,6 +131,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     maxLines: 3,
                     keyboardType: TextInputType.multiline,
                     focusNode: _decriptionFocusNode,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a description';
+                      }
+                      if (value.length < 10) {
+                        return 'Please enter at least 10 characters';
+                      }
+                      return null;
+                    },
                     onSaved: (value) {
                       _editedProduct = Product(
                           title: _editedProduct.title,
@@ -141,6 +173,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           focusNode: _imageUrlFocusNode,
                           onFieldSubmitted: (_) {
                             _saveForm();
+                          },
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter an image URL';
+                            }
+                            if (!value.startsWith('http') &&
+                                !value.startsWith('https')) {
+                              return 'Please enter a valid URL';
+                            }
+
+                            if (!value.endsWith('.png') &&
+                                !value.endsWith('.jpg') &&
+                                !value.endsWith('.jpeg')) {
+                              return 'Please enter a valid Image URL';
+                            }
+                            return null;
                           },
                           onSaved: (value) {
                             _editedProduct = Product(
