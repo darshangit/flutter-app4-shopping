@@ -22,6 +22,10 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get userId {
+    return _userId;
+  }
+
   Future<void> authenticate(
       String email, String password, String urlSegment) async {
     try {
@@ -42,7 +46,7 @@ class Auth with ChangeNotifier {
       _userId = responseData['localId'];
       _expiryDate = DateTime.now()
           .add(Duration(seconds: int.parse(responseData['expiresIn'])));
-          notifyListeners();
+      notifyListeners();
     } catch (error) {
       throw error;
     }

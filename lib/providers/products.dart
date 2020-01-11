@@ -45,8 +45,9 @@ class Products with ChangeNotifier {
 //
 
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this._items, this.userId);
   List<Product> get items {
     // if (_showFavoritesOnly) {
     //   return _items.where((prodItem) => prodItem.isFavorite).toList();
@@ -63,14 +64,20 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url =
+    var url =
         'https://flutter-shops-72a6a.firebaseio.com/products.json?auth=$authToken';
     final response = await http.get(url); // can add error handling logic here.
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     if (extractedData == null) {
       return;
     }
+    url =
+        'https://flutter-shops-72a6a.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+
+    final favoriteResponse = await http.get(url);
     final List<Product> loadedProducts = [];
+    final favoriteData = json.decode(favoriteResponse.body);
+
     extractedData.forEach((prodId, prodData) {
       loadedProducts.add(Product(
           id: prodId,
@@ -78,7 +85,7 @@ class Products with ChangeNotifier {
           price: prodData['price'],
           description: prodData['description'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite']));
+          isFavorite: favoriteData == null ? false : favoriteData[prodId] ?? false));
     });
 
     _items = loadedProducts;
@@ -95,7 +102,6 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
-            'isFavorite': product.isFavorite
           }));
 
       final newProduct = Product(
@@ -132,7 +138,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = 'https://flutter-shops-72a6a.firebaseio.com/products/$id.json?auth=$authToken';
+    final url =
+        'https://flutter-shops-72a6a.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
